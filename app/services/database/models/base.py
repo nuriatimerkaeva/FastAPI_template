@@ -19,6 +19,6 @@ class Base:
         onupdate=datetime.now,
     )
 
-      @declared_attr
+    @declared_attr
     def __tablename__(cls) -> str:
         return cls.__name__.lower()
