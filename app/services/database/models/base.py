@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declared_attr, as_declarative
 from sqlalchemy import DateTime, Column
 
 
-@as_declarative
+@as_declarative()
 class Base:
     id: int
 
