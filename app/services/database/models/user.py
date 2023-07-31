@@ -1,14 +1,17 @@
-from sqlalchemy import Column, String, Boolean, Date
+from datetime import date
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
 
-from app.services.database.models.base import Base
+from app.services.database.models.base import Base, BaseWithId, BaseWithTime
 
 
-class User(Base):
-    name = Column(String, index=True)
-    last_name = Column(String, index=True)
-    username = Column(String, index=True, nullable=False, unique=True)
-    birth_day = Column(Date, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean(), default=False)
-    role = Column(String, default='User')
+class User(Base, BaseWithId, BaseWithTime):
+
+    name: Mapped[str] = mapped_column(index=True, nullable=True)
+    last_name: Mapped[str] = mapped_column(index=True, nullable=True)
+    username: Mapped[str]  = mapped_column(index=True, nullable=False, unique=True)
+    birth_day: Mapped[date] = mapped_column(nullable=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    is_active: Mapped[bool] = mapped_column(default=False, nullable=False)
+    role: Mapped[str] = mapped_column(default='User', nullable=False)
