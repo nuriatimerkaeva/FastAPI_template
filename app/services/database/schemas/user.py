@@ -9,17 +9,16 @@ class UserBase(BaseModel):
     email: EmailStr
     role: str
     is_active: bool
-    hashed_password: str
 
     class Config:
         orm_mode = True
 
 
 class UserUpdate(UserBase):
-    name: str
-    last_name: str
+    name: Optional[str]
+    last_name: Optional[str]
     birth_day: Optional[int]
 
 
-class UserCreate(UserUpdate):
+class UserCreate(UserBase):
     pass
