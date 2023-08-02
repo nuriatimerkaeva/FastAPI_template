@@ -1,3 +1,4 @@
+from typing import Optional
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr, as_declarative
@@ -17,12 +18,9 @@ class Base:
         return type(self).__name__.lower()
 
 
-class BaseWithId:
+class BaseWithIdAndTime:
 
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
-
-
-class BaseWithTime:
+    id: Mapped[Optional[UUID]] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=uuid.uuid4)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
