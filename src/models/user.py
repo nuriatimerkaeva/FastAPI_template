@@ -2,7 +2,7 @@ from datetime import date
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import Mapped
 
-from src.services.models import Base, BaseWithIdAndTime
+from src.models.base import Base, BaseWithIdAndTime
 
 
 class User(Base, BaseWithIdAndTime):
