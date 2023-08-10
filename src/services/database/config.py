@@ -1,0 +1,8 @@
+from os import environ
+
+
+POSTGRES_USER = environ.get("POSTGRES_USER")
+POSTGRES_PASSWORD = environ.get("POSTGRES_PASSWORD")
+POSTGRES_SERVER = environ.get("POSTGRES_SERVER")
+POSTGRES_DB_NAME = environ.get("POSTGRES_DB_NAME")
+POSTGRESQL_DB_URL = environ.get("POSTGRESQL_DB_URL")

@@ -1,11 +1,9 @@
 from typing import Optional
 import uuid
 from datetime import datetime
-from sqlalchemy.ext.declarative import declared_attr, as_declarative
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import DateTime
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column, Mapped, as_declarative, declared_attr
 
 
 @as_declarative()
@@ -13,14 +11,15 @@ class Base:
 
     __abstract__: bool = True
 
+    @classmethod
     @declared_attr
-    def __tablename__(self) -> str:
-        return type(self).__name__.lower()
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower()
 
 
 class BaseWithIdAndTime:
 
-    id: Mapped[Optional[UUID]] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=uuid.uuid4)
+    id: Mapped[Optional[UUID]] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

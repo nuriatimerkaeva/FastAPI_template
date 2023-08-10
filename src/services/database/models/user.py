@@ -2,10 +2,10 @@ from datetime import date
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import Mapped
 
-from app.services.database.models.base import Base, BaseWithId, BaseWithTime
+from app.services.database.models.base import Base, BaseWithIdAndTime
 
 
-class User(Base, BaseWithId, BaseWithTime):
+class User(Base, BaseWithIdAndTime):
 
     name: Mapped[str] = mapped_column(index=True, nullable=True)
     last_name: Mapped[str] = mapped_column(index=True, nullable=True)
