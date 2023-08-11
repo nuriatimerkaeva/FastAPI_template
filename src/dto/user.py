@@ -21,7 +21,7 @@ class UserCreate(UserDTO, UserWithEmail, UserPrivate):
     pass
 
 
-class UserUpdate(UserDTO, UserWithEmail, UserPrivate):
+class UserUpdate(UserCreate):
     name: Optional[str]
     last_name: Optional[str]
     birth_day: Optional[int]
