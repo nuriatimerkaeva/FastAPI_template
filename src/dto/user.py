@@ -6,6 +6,9 @@ class UserDTO(BaseModel):
     id: int
     role: str
 
+    class Config:
+        from_attributes = True
+
 
 class UserWithEmail(BaseModel):
     email: EmailStr
