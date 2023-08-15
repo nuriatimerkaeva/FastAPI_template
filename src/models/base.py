@@ -16,6 +16,15 @@ class Base:
     def __tablename__(cls) -> str:
         return cls.__name__.lower()
 
+    def __repr__(self) -> str:
+        class_name = self.__class__.__name__
+        attributes = ", ".join(
+            f"{attr}={getattr(self, attr)}"
+            for attr in self.__mapper__.column_attrs.keys()
+        )
+        return f"<{class_name}({attributes})>"
+
+
 
 class BaseWithIdAndTime:
 
