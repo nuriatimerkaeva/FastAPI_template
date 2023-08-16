@@ -44,27 +44,31 @@ class SQLAlchemyRepository(AbstractRepository):
                 one_position = await session.execute(stmt)
                 return one_position
             except NoResultFound:
-                raise NoResultFound("Position isn't found")
-
+                return "Position was not found"
 
     async def get_all(self):
         async with async_session_maker() as session:
-            stmt = select(self.model)
-            all_positions = await session.execute(stmt)
-            all_positions = [row[0].to_read_model() for row in all_positions.all()]
-            return all_positions
+            try:
+                stmt = select(self.model)
+                all_positions = await session.execute(stmt)
+                all_positions = [row[0].to_read_model() for row in all_positions.all()]
+                return all_positions
+            except NoResultFound:
+                return "Positions were not found"
 
     async def update(self, data: dict) -> str:
         async with async_session_meker as session:
-            session.merge(data)
+            stmt = self.model.merge_with(**data)
+            updated_data = await session.execute(stmt)
             await session.commit()
-            return "Updated successfully"
+            return updated_data
 
     async def delete(self, data: dict) -> str:
         async with async_session_maker as session:
             try:
-                session.delete(data)
+                stmt = self.model.delete(data)
+                deleted_data = await session.execute(stmt)
                 await session.commit()
-                return "Deleted successfully"
+                return deleted_data
             except NoResultFound:
-                raise NoResultFound("Data isn't found")
+                return "Data was not found"
