@@ -52,8 +52,7 @@ class SQLAlchemyRepository(AbstractRepository):
             try:
                 stmt = select(self.model)
                 all_positions = await session.execute(stmt)
-                all_positions = [row[0].to_read_model() for row in all_positions.all()]
-                return all_positions
+                return all_positions.scalars().all()
             except NoResultFound:
                 return "Positions were not found"
 
