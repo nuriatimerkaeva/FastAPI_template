@@ -49,10 +49,13 @@ class SQLAlchemyRepository(AbstractRepository):
 
     async def get_all(self):
         async with async_session_maker() as session:
-            stmt = select(self.model)
-            all_positions = await session.execute(stmt)
-            all_positions = [row[0].to_read_model() for row in all_positions.all()]
-            return all_positions
+            try:
+                stmt = select(self.model)
+                all_positions = await session.execute(stmt)
+                all_positions = [row[0].to_read_model() for row in all_positions.all()]
+                return all_positions
+            except NoResultFound:
+                return "Positions were not found"
 
     async def update(self, data: dict):
         async with async_session_maker() as session:
@@ -68,11 +71,14 @@ class SQLAlchemyRepository(AbstractRepository):
 
     async def delete(self, data: dict):
         async with async_session_maker() as session:
-            stmt = (
-                delete(self.model)
-                .where(self.model.id == data['id'])
-                .returning(self.model)
-            )
-            deleted_data = await session.execute(stmt)
-            await session.commit()
-            return deleted_data.scalar()
+            try:
+                stmt = (
+                    delete(self.model)
+                    .where(self.model.id == data['id'])
+                    .returning(self.model)
+                )
+                deleted_data = await session.execute(stmt)
+                await session.commit()
+                return deleted_data.scalar()
+            except NoResultFound:
+                return "Position was not found"
