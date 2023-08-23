@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from src.common.types import _Role
 
 
@@ -31,6 +31,6 @@ class UserUpdate(BaseModel):
     username: Optional[str]
     hashed_password: Optional[str]
     is_active: Optional[bool]
-    name: Optional[str]
-    last_name: Optional[str]
+    name: Optional[str] = Field(min_length=1, max_length=128)
+    last_name: Optional[str] = Field(min_length=1, max_length=128)
     birthday: Optional[int]
