@@ -1,4 +1,4 @@
-from typing import TypeAlias, Literal, ParamSpec
+from typing import TypeAlias, Literal, ParamSpec, TypeVar
 
 
 _Role: TypeAlias = Literal['user', 'admin', 'superuser']
