@@ -2,7 +2,7 @@ from datetime import date
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import Mapped
 
-from src.models.base import Base, BaseWithIdAndTime
+from src.services.database.models.base import Base, BaseWithIdAndTime
 from src.common.types import _Role
 
 

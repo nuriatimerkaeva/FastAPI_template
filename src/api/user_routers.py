@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.services.database.repositories.user_repo import UserRepository
-from src.models import User
-from src.dto.user import UserDTO, UserCreate, UserUpdate
+from src.services.database.models.user import User
+from src.common.dto import UserDTO, UserCreate, UserUpdate
 
 router = APIRouter()
 
