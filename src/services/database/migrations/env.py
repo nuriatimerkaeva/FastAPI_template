@@ -1,43 +1,31 @@
+import asyncio
 from logging.config import fileConfig
-from os import environ
+from typing import no_type_check
 
-from dotenv import load_dotenv
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
+import nest_asyncio
 from alembic import context
+from sqlalchemy import engine_from_config, pool
+from sqlalchemy.ext.asyncio import AsyncEngine
 
-from app.services.database.models.base import Base
-from app.services.database.config import POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_SERVER, POSTGRES_DB_NAME
-
-config = context.config
-
-section = config.config_ini_section
-load_dotenv()
-
-config.set_section_option(section, "POSTGRES_USER", POSTGRES_USER)
-config.set_section_option(section, "POSTGRES_PASSWORD", POSTGRES_PASSWORD)
-config.set_section_option(section, "POSTGRES_SERVER", POSTGRES_SERVER)
-config.set_section_option(section, "POSTGRES_DB_NAME", POSTGRES_DB_NAME)
-
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+from src.services.database.models.base import Base
+from src.core.settings import settings
 
 target_metadata = Base.metadata
 
+config = context.config  # type: ignore
 
-def run_migrations_offline() -> None:
+fileConfig(config.config_file_name)
+config.set_main_option("sqlalchemy.url", settings.db_url + '?async_fallback=True')
+
+
+def run_migrations_offline():
     """Run migrations in 'offline' mode.
-
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
     here as well.  By skipping the Engine creation
     we don't even need a DBAPI to be available.
-
     Calls to context.execute() here emit the given string to the
     script output.
-
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -45,35 +33,48 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_server_default=True,
+        compare_type=True,
     )
 
     with context.begin_transaction():
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+@no_type_check
+def do_run_migrations(connection):
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_server_default=True,
+        compare_type=True,
+        include_schemas=True,
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+    with context.begin_transaction():
+        context.run_migrations()
 
-        with context.begin_transaction():
-            context.run_migrations()
+
+async def run_migrations_online():
+    """Run migrations in 'online' mode.
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+    """
+    connectable = AsyncEngine(
+        engine_from_config(
+            config.get_section(config.config_ini_section),
+            prefix="sqlalchemy.",  # noqa
+            poolclass=pool.NullPool,
+            future=True,
+        )
+    )
+
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    nest_asyncio.apply()
+    asyncio.get_event_loop().run_until_complete(run_migrations_online())
