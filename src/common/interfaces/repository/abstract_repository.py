@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing  import Generic, Type, Dict, Iterable, Tuple, Optional, Union, Any
 from src.common.types import EntryType
-from src.interfaces.repository.base_repo import BaseRepository
+from src.common.interfaces.repository.base_repo import BaseRepository
 
 class AbstractRepository(ABC, BaseRepository, Generic[EntryType]):
 
