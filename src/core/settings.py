@@ -1,3 +1,4 @@
+import secrets
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -16,6 +17,8 @@ class Settings(BaseSettings):
     DB_PORT: str
     DB_NAME: str
 
+    SECRET_KEY: str = secrets.token_hex(32)
+
     @property
     def db_url(self) -> str:
         return self.DB_URL.format(
@@ -32,4 +35,3 @@ def load_settings() -> Settings:
     return Settings()
 
 
-settings = Settings()
