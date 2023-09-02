@@ -15,7 +15,7 @@ target_metadata = Base.metadata
 config = context.config  # type: ignore
 
 fileConfig(config.config_file_name)
-config.set_main_option("sqlalchemy.url", load_settings.db_url + '?async_fallback=True')
+config.set_main_option("sqlalchemy.url", load_settings().db_url + '?async_fallback=True')
 
 
 def run_migrations_offline():
