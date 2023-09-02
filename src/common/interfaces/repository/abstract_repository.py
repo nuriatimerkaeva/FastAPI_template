@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing  import Generic, Type, Dict, Iterable, Tuple, Optional, Union, Any
+from typing  import Generic, Type, Dict, Iterable, Tuple, Optional, Union, Any, List
 from src.common.types import EntryType
 from src.common.interfaces.repository.base_repo import BaseRepository
 

@@ -1,5 +1,6 @@
-from typing import Protocol
+from typing import Protocol, Any
 from src.common.types import Param
+from abc import abstractmethod
 
 
 class BaseRepository(Protocol):
