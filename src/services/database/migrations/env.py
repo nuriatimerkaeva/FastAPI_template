@@ -8,14 +8,14 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.services.database.models.base import Base
-from src.core.settings import settings
+from src.core.settings import load_settings
 
 target_metadata = Base.metadata
 
 config = context.config  # type: ignore
 
 fileConfig(config.config_file_name)
-config.set_main_option("sqlalchemy.url", settings.db_url + '?async_fallback=True')
+config.set_main_option("sqlalchemy.url", load_settings.db_url + '?async_fallback=True')
 
 
 def run_migrations_offline():
