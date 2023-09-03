@@ -13,11 +13,11 @@ class Auth:
             'scope': scope,
             'sub': username
         }
-        return jwt.encode(payload, load_settings.SECRET_KEY, algorithm='HS256')
+        return jwt.encode(payload, load_settings.secret_key, algorithm='HS256')
 
     def _verify_token(self, token, expected_scope):
         try:
-            payload = jwt.decode(token, load_settings.SECRET_KEY, algorithm='HS256')
+            payload = jwt.decode(token, load_settings.secret_key, algorithm='HS256')
             if payload['scope'] == expected_scope:
                 return payload['sub']
             raise HTTPException(status_code=401, detail='Token scope is invalid')

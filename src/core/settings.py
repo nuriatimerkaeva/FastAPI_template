@@ -10,28 +10,26 @@ class Settings(BaseSettings):
         env_file_encoding='utf-8',
         case_sensitive=False
     )
-    DB_URL: str
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_HOST: str
-    DB_PORT: str
-    DB_NAME: str
+    db_url: str
+    db_user: str
+    db_password: str
+    db_host: str
+    db_port: str
+    db_name: str
 
-    SECRET_KEY: str = secrets.token_hex(32)
+    secret_key: str = secrets.token_hex(32)
 
     @property
     def db_url(self) -> str:
         return self.DB_URL.format(
-            db_user=self.DB_USER,
-            db_password=self.DB_PASSWORD,
-            db_host=self.DB_HOST,
-            db_port=self.DB_PORT,
-            db_name=self.DB_NAME,
+            db_user=self.db_user,
+            db_password=self.db_password,
+            db_host=self.db_host,
+            db_port=self.db_port,
+            db_name=self.db_name,
         )
 
 
 @lru_cache(typed=True)
 def load_settings() -> Settings:
     return Settings()
-
-
