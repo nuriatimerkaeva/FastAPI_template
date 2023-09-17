@@ -14,14 +14,14 @@ class Settings(BaseSettings):
     db_user: str
     db_password: str
     db_host: str
-    db_port: str
+    db_port: int
     db_name: str
 
     secret_key: str = secrets.token_hex(32)
 
     @property
     def db_url(self) -> str:
-        return self.DB_URL.format(
+        return self.db_url.format(
             db_user=self.db_user,
             db_password=self.db_password,
             db_host=self.db_host,
