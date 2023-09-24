@@ -1,33 +1,32 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.services.database.repositories.user_repo import UserRepository
 from src.services.database.models.user import User
 from src.common.dto.user import UserDTO, UserCreate, UserUpdate
+from src.api.dependencies import UserRepositoryDependency
 
 router = APIRouter()
 
 
-@router.post("/create", response_model=UserCreate, status_code=200)
+@router.post("/", response_model=UserCreate, status_code=200)
 async def create_new_user(new_user: UserCreate,
-                          user_crud: UserRepository = Depends(UserRepository),
+                          user_crud: UserRepository = Depends(UserRepositoryDependency),
                           ):
-    user = await user_crud.get_one(email=new_user.email)
+    user = await user_crud.get_by_email(email=new_user.email)
     if user:
         raise HTTPException(
             status_code=400,
             detail="The user with this email already exists.",
             )
-    user = await user_crud.add_one(new_user)
+    user = await user_crud.create_user(new_user)
     return user
 
 
-@router.get("/me", response_model=UserDTO, status_code=200)
+@router.get("/{id}/", response_model=UserDTO, status_code=200)
 async def get_user_by_id(user: UserDTO,
-                         user_crud: UserRepository = Depends(UserRepository)
+                         user_crud: UserRepository = Depends(UserRepositoryDependency)
                          ):
-    user = await user_crud.get_one(id=user.id)
+    user = await user_crud.get_by_id(id=user.id)
     if not user:
         raise HTTPException(
             status_code=400,
@@ -35,16 +34,14 @@ async def get_user_by_id(user: UserDTO,
         )
         return user
 
-@router.put("/update", response_model=UserUpdate, status_code=200)
-async def update_user(user: UserUpdate,
-                      user_crud: UserRepository = Depends(UserRepository)
-                      ):
-    user = await user_crud.update(user)
-    return user
-
-@router.delete("/update", response_model=UserUpdate, status_code=200)
-async def update_user(user: UserDTO,
-                      user_crud: UserRepository = Depends(UserRepository)
-                      ):
-    user = await user_crud.delete(user)
-    return user
+@router.get("/{email}/", response_model=UserDTO, status_code=200)
+async def get_user_by_id(user: UserDTO,
+                         user_crud: UserRepository = Depends(UserRepositoryDependency)
+                         ):
+    user = await user_crud.get_by_email(email=user.email)
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="user does not exist.",
+        )
+        return user

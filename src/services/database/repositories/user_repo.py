@@ -15,9 +15,9 @@ class UserRepository(BaseRepository):
         user = await self._get(User.email, email)
         return UserWithEmail.model_validate(user) if user else None
 
-    async def create_user(self, user_create: UserCreate) -> UserPrivate:
+    async def create_user(self, user_create: UserCreate) -> UserDTO:
         user = await self._add(**user_create.model_dump())
-        return UserPrivate.model_validate(user)
+        return UserCreate.model_validate(user)
 
     async def update_user(self, user_id: int, user_update: UserUpdate) -> UserUpdate:
         user = await self._update(User.id, user_id, user_update.model_dump(exclude_unset=True))
