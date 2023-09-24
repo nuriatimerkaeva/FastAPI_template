@@ -1,66 +1,51 @@
-from typing import Type, Dict, Any, Optional, Union, Iterable, Tuple, List
-from sqlalchemy.orm import Session
-from fastapi import Depends
+from typing import ClassVar, Type, Any, Optional, Dict
+from sqlalchemy import select, update, delete, insert
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import NoResultFound
 
-from src.services.database.session import get_session
 from src.common.interfaces.repository.abstract_repository import AbstractRepository
-from src.common.interfaces.repository.uow import UnitOfWork
-from src.services.database.repositories.base import BaseRepository
-from src.common.types import EntryType
+from src.common.types import Model
 
 
-class CRUDRepository(AbstractRepository, BaseRepository):
+class CRUDRepository(AbstractRepository):
 
-    def __init__(self, model: Type[EntryType], session: Session = Depends(get_session)):
-        super().__init__(model)
-        self.unit_of_work = UnitOfWork(session)
+    model: ClassVar[Type[Model]]
 
-    async def add_one(self, **values: Dict[str, Any]) -> Optional[EntryType]:
-        entry = self.model(**values)
-        self.session.add(entry)
-        self.unit_of_work.commit()
-        self.session.refresh(entry)
-        return entry
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
-    async def add_few(self, data: Iterable[Union[EntryType, Dict[str, Any]]]) -> List[EntryType]:
-        entries = [self.model(**entry_data) if isinstance(entry_data, dict) else entry_data for entry_data in data]
-        self.session.add_all(entries)
-        self.unit_of_work.commit()
-        self.session.refresh_all(entries)
-        return entries
+    async def _add(self, **values: Dict[str, Any]) -> Optional[Model]:
 
-    async def get_one(self, *clauses: Tuple[Any]) -> Optional[EntryType]:
-        return self.session.query(self.model).filter(*clauses).first()
+        stmt = (
+            insert(self.model)
+            .values(**values)
+            .returning(self.model)
+        )
 
-    async def get_few(self, *clauses: Tuple[Any], offset: Optional[int], limit: Optional[int]) -> List[EntryType]:
-        query = self.session.query(self.model).filter(*clauses)
-        if offset is not None:
-            query = query.offset(offset)
-        if limit is not None:
-            query = query.limit(limit)
-        return query.all()
+        return (await self.session.execute(stmt)).scalars().first()
 
-    async def update_one(self, *clauses: Tuple[Any], **values: Dict[str, Any]) -> Optional[EntryType]:
-        entry = self.get_one(*clauses)
-        if entry:
-            for key, value in values.items():
-                setattr(entry, key, value)
-            self.unit_of_work.commit()
-            self.session.refresh(entry)
-        return entry
+    async def _get(self, field: Any, value: Any) -> Optional[Model]:
+        try:
+            stmt = (select(self.model)
+                    .where(field == value)
+                    )
+            return (await self.session.execute(stmt)).scalars().first()
+        except NoResultFound:
+            return None
 
-    async def update_few(self, data: Iterable[Union[EntryType, Dict[str, Any]]]) -> Any:
-        for entry_data in data:
-            if isinstance(entry_data, dict):
-                entry = self.get_one(*entry_data.get("clauses", ()))
-                if entry:
-                    for key, value in entry_data.get("values", {}).items():
-                        setattr(entry, key, value)
-        self.unit_of_work.commit()
+    async def _update(self, field: Any, value: Any, data: dict) -> Optional[Model]:
+        stmt = (
+            update(self.model)
+            .where(field == value)
+            .values(**data)
+            .returning(self.model)
+        )
+        return (await self.session.execute(stmt)).scalars().all()
 
-    async def delete(self, *clauses: Tuple[Any]) -> Optional[EntryType]:
-        entry = self.get_one(*clauses)
-        if entry:
-            self.session.delete(entry)
-            self.unit_of_work.commit()
-        return entry
+    async def _delete(self, field: Any, model_id: int) -> Optional[Model]:
+        stmt = (
+            delete(self.model)
+            .where(field == model_id)
+            .returning(self.model)
+        )
+        return (await self.session.execute(stmt)).scalars().all()
