@@ -14,17 +14,14 @@ class CRUDRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def _add(self, **values: Dict[str, Any]) -> Optional[Model]:
+    async def create(self, data: dict) -> Optional[Model]:
+        new_obj = self.model(**data)
+        self.session.add(new_obj)
+        await self.session.commit()
+        await self.session.refresh(new_obj)
+        return new_obj
 
-        stmt = (
-            insert(self.model)
-            .values(**values)
-            .returning(self.model)
-        )
-
-        return (await self.session.execute(stmt)).scalars().first()
-
-    async def _get(self, field: Any, value: Any) -> Optional[Model]:
+    async def get(self, field: Any, value: Any) -> Optional[Model]:
         try:
             stmt = (select(self.model)
                     .where(field == value)
@@ -33,7 +30,7 @@ class CRUDRepository(AbstractRepository):
         except NoResultFound:
             return None
 
-    async def _update(self, field: Any, value: Any, data: dict) -> Optional[Model]:
+    async def update(self, field: Any, value: Any, data: dict) -> Optional[Model]:
         stmt = (
             update(self.model)
             .where(field == value)
@@ -42,7 +39,7 @@ class CRUDRepository(AbstractRepository):
         )
         return (await self.session.execute(stmt)).scalars().all()
 
-    async def _delete(self, field: Any, model_id: int) -> Optional[Model]:
+    async def delete(self, field: Any, model_id: int) -> Optional[Model]:
         stmt = (
             delete(self.model)
             .where(field == model_id)
