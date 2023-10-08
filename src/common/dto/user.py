@@ -6,22 +6,18 @@ from src.common.types import _Role
 class UserDTO(BaseModel):
     id: int
     role: _Role
+    email: Optional[EmailStr]
+    username: Optional[str]
+    hashed_password: Optional[str]
+    is_active: Optional[bool]
+    name: Optional[str] = Field(min_length=1, max_length=128)
+    last_name: Optional[str] = Field(min_length=1, max_length=128)
 
     class Config:
         from_attributes = True
 
 
-class UserWithEmail(BaseModel):
-    email: EmailStr
-
-
-class UserPrivate(BaseModel):
-    username: str
-    hashed_password: str
-    is_active: bool
-
-
-class UserCreate(UserDTO, UserWithEmail, UserPrivate):
+class UserCreate(UserDTO):
     pass
 
 
@@ -33,4 +29,3 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool]
     name: Optional[str] = Field(min_length=1, max_length=128)
     last_name: Optional[str] = Field(min_length=1, max_length=128)
-    birthday: Optional[int]
