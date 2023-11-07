@@ -11,5 +11,5 @@ class User(Base, BaseWithIdAndTime):
     username: Mapped[str] = mapped_column(index=True, nullable=False, unique=True)
     email: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
-    is_active: Mapped[bool] = mapped_column(default=False, nullable=False)
-    role: Mapped[_Role] = mapped_column(default='User', nullable=False)
+    is_active: Mapped[bool] = mapped_column(server_default=False, nullable=False)
+    role: Mapped[_Role] = mapped_column(server_default='User', nullable=False)
