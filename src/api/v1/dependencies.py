@@ -1,2 +1,2 @@
-class UserRepositoryDependency:
+class UserRepositoryDependencyMarker:
     pass
