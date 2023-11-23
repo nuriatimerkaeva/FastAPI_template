@@ -1,7 +1,6 @@
-from typing import ClassVar, Type, Any, Optional, Dict
+from typing import ClassVar, Type, Any, Optional, List
 from sqlalchemy import select, update, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm.exc import NoResultFound
 
 from src.common.interfaces.repository.abstract_repository import AbstractRepository
 from src.common.types import Model
@@ -12,37 +11,63 @@ class CRUDRepository(AbstractRepository):
     model: ClassVar[Type[Model]]
 
     def __init__(self, session: AsyncSession):
-        self.session = session
-
-    async def create(self, data: dict) -> Optional[Model]:
-        new_obj = self.model(**data)
-        self.session.add(new_obj)
-        await self.session.commit()
-        await self.session.refresh(new_obj)
-        return new_obj
+        self._session = session
 
     async def get(self, field: Any, value: Any) -> Optional[Model]:
-        try:
-            stmt = (select(self.model)
-                    .where(field == value)
-                    )
-            return (await self.session.execute(stmt)).scalars().first()
-        except NoResultFound:
-            return None
 
-    async def update(self, field: Any, value: Any, data: dict) -> Optional[Model]:
+        stmt = (
+            select(self.model)
+            .where(field == value)
+        )
+
+        result = await self._session.scalar(stmt)
+        return result
+
+    async def create(self, data: dict) -> Model:
+        new_obj = self.model(**data)
+        self._session.add(new_obj)
+        await self._session.commit()
+        await self._session.refresh(new_obj)
+        return new_obj
+
+    async def update(self, field: Any, value: Any, data: dict) -> Model:
         stmt = (
             update(self.model)
             .where(field == value)
             .values(**data)
             .returning(self.model)
         )
-        return (await self.session.execute(stmt)).scalars().all()
+        result = await self._session.scalar(stmt)
+        await self._session.commit()
+        await self._session.refresh(result)
+        return result
 
-    async def delete(self, field: Any, model_id: int) -> Optional[Model]:
+    async def delete(self, field: Any, model_id: int) -> Optional[bool]:
         stmt = (
             delete(self.model)
             .where(field == model_id)
-            .returning(self.model)
         )
-        return (await self.session.execute(stmt)).scalars().all()
+
+        result = await self._session.execute(stmt)
+        await self._session.commit()
+        if result.rowcount:
+            return True
+        return None
+
+    async def get_many(self, limit: int, offset: int, field: Any = None, value: Any = None) -> Optional[List[Model]]:
+
+        if field and value:
+            stmt = (
+                select(self.model)
+                .where(field == value)
+                .offset(offset)
+                .limit(limit)
+            )
+        else:
+            stmt = (
+                select(self.model)
+                .offset(offset)
+                .limit(limit)
+            )
+        result = await self._session.scalars(stmt)
+        return result.all()
