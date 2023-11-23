@@ -1,0 +1,30 @@
+version: '3.10.9'
+services:
+  ####################
+  app:
+    build: .
+    command: sh -c 'alembic upgrade head && python -m src'
+    volumes: ./:/src
+    working_dir: /src
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+    depends_on:
+      - database
+  ####################
+  database:
+    image: postgres:latest
+    container_name: postgres_container
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - app_network
+    ports:
+      - "5400:5432"
