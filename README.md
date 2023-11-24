@@ -18,7 +18,7 @@ fastapi_project/
 │   │   │   ├── dependencies.py
 │   │   │   └── user_router.py
 │   │   ├── __init__.py
-│   │   └── router.py
+│   │   └── routers.py
 │   ├── common/
 │   │   ├── dto/
 │   │   │   ├── __init__.py
@@ -39,10 +39,10 @@ fastapi_project/
 │   │   │   └── new_account.html
 │   │   ├── __init__.py
 │   │   ├── model_converters.py
-│   │   └── typess.py
+│   │   └── types.py
 │   └── core/
 │   │   ├── __init__.py
-│   │   └── settingss.py
+│   │   └── settings.py
 │   └── services/
 │   │   ├── database/
 │   │   │   ├── migrations/ # default alembic folder
