@@ -98,8 +98,9 @@ DB_NAME  = dbname
 ### 4. Run a project
 
 Go to your working directory and enter the command:
-    ```bash
+```
     docker compose up
+```
 
 The aplication is available at:
 
@@ -108,4 +109,3 @@ http://localhost:8001.
 The documentation is available at:
 
 http://localhost:8001/docs.
-
