@@ -5,8 +5,8 @@ Simple backend template with FastAPI, PostgreSQL, SQLAlchemy and Alembic
 ### Contents.
 1. [Project Structure.](https://github.com/nuriatimerkaeva/FastAPI_template#1-project-structure)
 2. [How to copy a project.](https://github.com/nuriatimerkaeva/FastAPI_template#2-how-to-copy-a-project)
-3. [Env-file.](https://github.com/nuriatimerkaeva/FastAPI_template#3-how-to-copy-a-project)
-4. [Run a project.](https://github.com/nuriatimerkaeva/FastAPI_template#4-run-project)
+3. [Env-file.](https://github.com/nuriatimerkaeva/FastAPI_template#3-env-file)
+4. [Run a project.](https://github.com/nuriatimerkaeva/FastAPI_template#4-run-a-project)
 
 ### 1. Project Structure.
 ```
