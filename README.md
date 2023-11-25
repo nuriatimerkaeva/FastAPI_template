@@ -104,8 +104,12 @@ Go to your working directory and enter the command:
 
 The aplication is available at:
 
+```
 http://localhost:8001.
+```
 
 The documentation is available at:
 
+```
 http://localhost:8001/docs.
+```
